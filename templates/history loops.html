@@ -1,0 +1,40 @@
+ <table>
+     {% for thought in thoughts %}
+        <tr>
+          <th>{{ thought[2] }}</th>
+        </tr>
+    {% endfor %}
+  </table>
+
+
+<table>
+  {% for thought[i] in thoughts[1] %}
+  <thead>
+    <tr>
+      <th>{{ thought[i] }}</th>
+
+        {% for thought[i] in thoughts[2] %}
+        <tr>
+          <th>{{ thought[i] }}</th>
+        </tr>
+        {% endfor %}
+    </tr>
+  </thead>
+  {% endfor %}
+  </table>
+
+<table>
+  {% for thought in thoughts[1] %}
+  <thead>
+    <tr>
+      <th>{{ thought }}</th>
+
+        {% for thought in thoughts[2] %}
+        <tr>
+          <th>{{ thought }}</th>
+        </tr>
+        {% endfor %}
+    </tr>
+  </thead>
+  {% endfor %}
+  </table>

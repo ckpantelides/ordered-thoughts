@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link href="https://fonts.googleapis.com/css?family=Abril+Fatface" rel="stylesheet"/>
+
+
+<!--    <link href="style.css" rel="stylesheet"/>   -->
+ <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='style.css') }}">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<!--   <script src = "/static/myscript.js"></script> -->
+
+  <title>Ordered thoughts</title>
+
+</head>
+
+<body>
+
+    <h1 id="long">Ordered thoughts.</h1>
+
+    <form action="/newthought" method="post">
+      <p>Thought:</p>
+      <textarea name="thought"></textarea>
+      <br>
+      <br>
+      <p>Category:</p>
+      <input type="text" id="category" name="category">
+      <br>
+      <br>
+      <input type="submit" value="File thought" id="file">
+      <br>
+      <br>
+      <br>
+      <button type="submit" formaction="/history">View history</button>
+    </form>
+
+
+</body>
+
+</html>
