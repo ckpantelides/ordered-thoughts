@@ -1,0 +1,105 @@
+body {
+  background-color: #BAE8F5;
+}
+
+h1 {
+  font-family: 'Abril Fatface', cursive;'Josefin Sans', sans-serif;
+  text-align: center;
+  font-size: 55px;
+  color: #06051d;
+  font-weight:normal;
+  padding-top: 100px;
+}
+
+h2 {
+  font-family: 'Abril Fatface', cursive;'Josefin Sans', sans-serif;
+  text-align: center;
+}
+
+p {
+  text-align: center;
+  font-size: 14px;
+  color: #06051d;
+  font-style: italic;
+  width: 100%;
+  font-weight:normal;
+}
+
+form {
+    text-align: center;
+    width: 100%;
+    font-size: 14px;
+    outline: none;
+    font-family: Times New Roman, serif;
+    background-color: #BAE8F5;
+    border: none;
+}
+
+textarea {
+    width: 60%;
+    border: 1px solid black;
+    height: 150px;
+    padding: 12px 20px;
+    box-sizing: border-box;
+    background-color: #BAE8F5;
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    font-family: Times New Roman, serif;
+}
+
+input {
+    font-family: Times New Roman, serif;
+    text-align: center;
+    background-color: #BAE8F5;
+    outline: none;
+    border: none;
+    border-bottom: 1px solid black;
+}
+
+input#file {
+    border: 1px solid black;
+}
+
+input#category {
+    border: none;
+    display: block;
+    margin: 0 auto;
+    border-bottom: 1px solid black;
+}
+
+button {
+    font-family: Times New Roman, serif;
+    background-color: #BAE8F5;
+    outline: none;
+    border: 1px solid black;
+}
+
+div#container {
+    text-align: center;
+    width: 100%;
+}
+
+table {
+    font-family: Times New Roman, serif;
+    width: 70%;
+    border-collapse: collapse;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 14px;
+}
+
+table, td, th {
+    border: 1px solid black;
+}
+
+@media only screen and (max-width:450px) {
+
+  h1#long {
+      font-size : 45px;
+      }
+
+  textarea {
+    width: 100%;
+  }
+}
