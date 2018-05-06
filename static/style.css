@@ -102,4 +102,7 @@ table, td, th {
   textarea {
     width: 100%;
   }
+
+  table {
+    width: 100%;
 }
