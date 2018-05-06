@@ -1,15 +1,30 @@
-import sqlite3
+import sqlite3, html
 
-from flask import Flask, redirect, render_template, request, url_for, session
+from flask import Flask, redirect, render_template, request, url_for, session, flash
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions
 from werkzeug.security import check_password_hash, generate_password_hash
+from collections import defaultdict
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+
+# unwanted html characters with safe replacements
+html_escape_table = {
+  "&": "&amp;",
+  '"': "&quot;",
+  "'": "&apos;",
+  ">": "&gt;",
+  "<": "&lt;",
+  }
+
+# function to replace unwanted html characters (from users' html forms)
+def html_escape(text):
+  """Produce entities within text."""
+  return "".join(html_escape_table.get(c,c) for c in text)
 
 @app.route("/", methods=["GET", "POST"])
 def login():
@@ -23,16 +38,16 @@ def login():
 
         # Ensure username was submitted
         if not request.form.get("username"):
-            print("must provide username")
+            flash("must provide username")
             return render_template("login.html")
 
         # Ensure password was submitted
         if not request.form.get("password"):
-            print("must provide password")
+            flash("must provide password")
             return render_template("login.html")
 
-        # Selects username from login form
-        username=request.form.get("username")
+        # Selects username from login form, escapes harmful characters
+        username= html_escape(request.form.get("username"))
 
         # Selects database and cursor object
         db = sqlite3.connect("test.db")
@@ -45,17 +60,17 @@ def login():
 
         # Ensure username exists
         if username != row[1]:
-          print("invalid username")
+          flash("invalid username")
           return render_template('login.html')
 
         # Ensure password is correct
         if not check_password_hash(row[2], request.form.get("password")):
-          print("invalid password")
+          flash("invalid password")
           return render_template('login.html')
 
         # Remember which user has logged in
         session["user_id"] = row[0]
-        print(session["user_id"])
+
         db.close()
 
         # Redirect user to newthought page
@@ -77,22 +92,22 @@ def register():
 
       # Ensure username was submitted
       if not request.form.get("username"):
-        print("must provide username")
+        flash("must provide username")
         return render_template("register.html")
 
       # Ensure password was submitted
       if not request.form.get("password"):
-        print("must provide password")
+        flash("must provide password")
         return render_template("register.html")
 
       # Ensure password confirmation was submitted
       if not request.form.get("confirmation"):
-        print("must confirm password")
+        flash("must confirm password")
         return render_template("register.html")
 
       # Checks password and password confirmation match
       if request.form.get("password") != request.form.get("confirmation"):
-        print("password and confirmation don't match")
+        flash("password and confirmation don't match")
         return render_template("register.html")
 
       # selects database and cursor object
@@ -100,15 +115,16 @@ def register():
       cursor = db.cursor()
 
       # get username and password from register form, hash password with werkzeug
-      username = request.form.get("username")
-      hash = generate_password_hash(request.form.get("password"))
+      username = html_escape(request.form.get("username"))
+      password = html_escape(request.form.get("password"))
+      hash = generate_password_hash(password)
 
       # check through all usernames
       cursor.execute('SELECT * FROM users WHERE Username=?', (username,))
 
       # end registration if username exists
       if cursor.fetchone() is not None:
-        print("That username is already taken")
+        flash("That username is already taken")
         return render_template('register.html')
 
       # commit new user to database if username unique
@@ -117,7 +133,7 @@ def register():
                   VALUES(?,?)''', (username, hash))
         db.commit()
 
-      print('New user registered')
+      flash('New user registered')
 
       # select users data
       cursor.execute('SELECT * FROM users WHERE Username=?', (username,))
@@ -125,7 +141,6 @@ def register():
 
       # save user_id to session, so it can be used as foreign key for new thoughts
       session["user_id"] = row[0]
-      print(session["user_id"])
 
       return render_template("newthought.html")
 
@@ -149,7 +164,7 @@ def fileThought():
     db.execute('''INSERT INTO thoughts(category, thought, user_id)
                   VALUES(?,?,?)''', (category, thought, session["user_id"],))
 
-    print('Successly filed!')
+    flash('Successly filed!')
 
     # Save changes to database and close
     db.commit()
@@ -166,30 +181,15 @@ def history():
   # Get history of user's thoughts, group together by category
   db = sqlite3.connect("test.db")
   cursor = db.cursor()
+  collected_thoughts = cursor.execute('SELECT category, thought FROM thoughts WHERE user_id=? ORDER BY CATEGORY ASC', (session["user_id"],))
 
-  thoughts = cursor.execute('SELECT * FROM thoughts WHERE user_id=? ORDER BY CATEGORY ASC', (session["user_id"],))
+  # use default dict to reorganise users thoughts by its category key value
+  thoughts_by_category = defaultdict(list)
+  for category, thought in collected_thoughts:
+    thoughts_by_category[category].append(thought)
 
-  def nest(thoughts):
-    root = {}
-    for thought in thoughts:
-        d = root
-        for item in thought[:-2]:
-            d = d.setdefault(item, {})
-        d[thought[-2]] = thought[-1]
-    return root
-
-  # loop through each thought
-#  for thought in thoughts:
-#    category = thought[0]
-#    thought = thought[1]
-
-  return render_template("history.html", thoughts=thoughts)
-
-#  if request.method =="POST":
-#    return render_template("history.html")
-
-#  else:
-#    return render_template("history.html")
+  # pass thoughts_by_category dict into history.html, organise dict using .items() method
+  return render_template("history.html", thoughts_by_category=thoughts_by_category.items())
 
 if __name__ == '__main__':
     app.run()
