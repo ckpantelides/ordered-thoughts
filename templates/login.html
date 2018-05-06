@@ -3,15 +3,9 @@
 
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <link href="https://fonts.googleapis.com/css?family=Abril+Fatface" rel="stylesheet"/>
-
-
-<!--  <link href="style.css" rel="stylesheet"/>  -->
-   <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='style.css') }}">
-
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='style.css') }}">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<!--   <script src = "/static/myscript.js"></script> -->
 
   <title>Ordered thoughts - log-in</title>
 
@@ -21,6 +15,16 @@
 
     <h1>Log In.</h1>
 
+    <!-- For error message flashing -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Form for new users -->
     <form action="/" method="post">
 
       <input autocomplete="off" type="text" name="username" Placeholder="Username"/>
