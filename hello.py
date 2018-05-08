@@ -47,7 +47,9 @@ def login():
             return render_template("login.html")
 
         # Selects username from login form, escapes harmful characters
+        # forces lowercase
         username= html_escape(request.form.get("username"))
+        username= username.lower()
 
         # Selects database and cursor object
         db = sqlite3.connect("test.db")
@@ -57,14 +59,17 @@ def login():
         cursor.execute('SELECT * FROM users WHERE Username=?', (username,))
 
         row = cursor.fetchone()
-
+        
         # Ensure username exists
-        if username != row[1]:
+        if row == None:
           flash("invalid username")
           return render_template('login.html')
+        
+        # Turns password lowercase
+        password = (request.form.get("password")).lower()
 
         # Ensure password is correct
-        if not check_password_hash(row[2], request.form.get("password")):
+        if not check_password_hash(row[2], password):
           flash("invalid password")
           return render_template('login.html')
 
@@ -113,10 +118,11 @@ def register():
       # selects database and cursor object
       db = sqlite3.connect("test.db")
       cursor = db.cursor()
-
-      # get username and password from register form, hash password with werkzeug
-      username = html_escape(request.form.get("username"))
-      password = html_escape(request.form.get("password"))
+      
+      # get username and password from register form, 
+      # hash password with werkzeug, force lowercase
+      username = (html_escape(request.form.get("username"))).lower()
+      password = (html_escape(request.form.get("password"))).lower()
       hash = generate_password_hash(password)
 
       # check through all usernames
