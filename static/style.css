@@ -95,14 +95,20 @@ table, td, th {
 
 @media only screen and (max-width:450px) {
 
-  h1#long {
-      font-size : 45px;
+  h1#newthought {
+      font-size : 40px;
+      padding-top: 50px;
       }
-
+  
+  h1#history {
+      font-size : 45px;
+      padding-top: 50px;
+      }
+  
   textarea {
     width: 100%;
   }
 
   table {
     width: 100%;
-}
+  }
