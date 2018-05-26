@@ -1,4 +1,5 @@
 import sqlite3, html
+import config as config
 
 from flask import Flask, redirect, render_template, request, url_for, session, flash
 from flask_session import Session
@@ -11,7 +12,7 @@ from functools import wraps
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
-app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+app.secret_key = config.SECRET_KEY;
 
 # unwanted html characters with safe replacements
 html_escape_table = {
@@ -44,6 +45,7 @@ def login():
     # Forget any user_id
     session.clear()
 
+    # keeps user logged in when browser closed
     session.permanent = True
 
     # User reached route via POST (as by submitting a form via POST)
