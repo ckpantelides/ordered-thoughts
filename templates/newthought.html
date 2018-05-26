@@ -13,6 +13,12 @@
 
 <body>
 
+<form>
+    <button type="submit" formaction="/logout" id="logout">
+        <img src = static/logout.svg id="logout">
+    </button>
+</form>
+
     <h1 id="newthought">Ordered thoughts.</h1>
 
     <!-- For message flashing -->
@@ -25,7 +31,7 @@
     {% endwith %}
 
     <!-- Form to file new thoughts -->
-    <form action="/newthought" method="post">
+    <form action="/" method="post">
       <p>Thought:</p>
       <textarea name="thought"></textarea>
       <br>

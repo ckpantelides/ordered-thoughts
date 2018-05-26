@@ -2,6 +2,11 @@ body {
   background-color: #BAE8F5;
 }
 
+img#logout {
+  width: 15px;
+  height: 15px;
+}
+
 h1 {
   font-family: 'Abril Fatface', cursive;'Josefin Sans', sans-serif;
   text-align: center;
@@ -75,6 +80,14 @@ button {
     border: 1px solid black;
 }
 
+button#logout {
+  display: block;
+  margin: 0 auto;
+  border: none;
+  shadow: none;
+  padding-top: 20px;
+}
+
 div#container {
     text-align: center;
     width: 100%;
@@ -99,12 +112,12 @@ table, td, th {
       font-size : 40px;
       padding-top: 50px;
       }
-  
+
   h1#history {
       font-size : 45px;
       padding-top: 50px;
       }
-  
+
   textarea {
     width: 100%;
   }

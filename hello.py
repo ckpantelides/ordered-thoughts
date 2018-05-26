@@ -6,6 +6,7 @@ from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions
 from werkzeug.security import check_password_hash, generate_password_hash
 from collections import defaultdict
+from functools import wraps
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -26,12 +27,24 @@ def html_escape(text):
   """Produce entities within text."""
   return "".join(html_escape_table.get(c,c) for c in text)
 
-@app.route("/", methods=["GET", "POST"])
+# function to require login using flask decorator
+def login_required(f):
+    """Decorate routes to require login."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get("user_id") is None:
+            return redirect("/login")
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route("/login", methods=["GET", "POST"])
 def login():
     """Log user in"""
 
     # Forget any user_id
     session.clear()
+
+    session.permanent = True
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
@@ -59,12 +72,12 @@ def login():
         cursor.execute('SELECT * FROM users WHERE Username=?', (username,))
 
         row = cursor.fetchone()
-        
+
         # Ensure username exists
         if row == None:
           flash("invalid username")
           return render_template('login.html')
-        
+
         # Turns password lowercase
         password = (request.form.get("password")).lower()
 
@@ -79,11 +92,20 @@ def login():
         db.close()
 
         # Redirect user to newthought page
-        return redirect("/newthought")
+        return redirect("/")
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("login.html")
+
+@app.route("/logout", methods=["GET", "POST"])
+def logout():
+    """Log user out"""
+
+    # Forget any user_id
+    session.clear()
+
+    return render_template("login.html")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -118,8 +140,8 @@ def register():
       # selects database and cursor object
       db = sqlite3.connect("test.db")
       cursor = db.cursor()
-      
-      # get username and password from register form, 
+
+      # get username and password from register form,
       # hash password with werkzeug, force lowercase
       username = (html_escape(request.form.get("username"))).lower()
       password = (html_escape(request.form.get("password"))).lower()
@@ -153,7 +175,8 @@ def register():
     else:
       return render_template("register.html")
 
-@app.route('/newthought', methods=["GET", "POST"])
+@app.route('/', methods=["GET", "POST"])
+@login_required
 def fileThought():
   """File new thought"""
 
@@ -181,6 +204,7 @@ def fileThought():
     return render_template("newthought.html")
 
 @app.route('/history', methods=["GET", "POST"])
+@login_required
 def history():
   """See history of thoughts"""
 
