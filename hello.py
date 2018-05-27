@@ -1,5 +1,5 @@
 import sqlite3, html
-import config as config
+import os
 
 from flask import Flask, redirect, render_template, request, url_for, session, flash
 from flask_session import Session
@@ -12,7 +12,7 @@ from functools import wraps
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
-app.secret_key = config.SECRET_KEY;
+app.secret_key = os.environ.get('SECRET_KEY')
 
 # unwanted html characters with safe replacements
 html_escape_table = {
