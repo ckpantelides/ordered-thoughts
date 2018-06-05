@@ -86,6 +86,14 @@ button#logout {
   border: none;
   shadow: none;
   padding-top: 20px;
+}
+
+button#logout2 {
+  display: block;
+  margin: 0 auto;
+  border: none;
+  shadow: none;
+  padding-top: 20px;
   padding-right: 30px;
 }
 
