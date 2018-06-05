@@ -2,7 +2,7 @@ body {
   background-color: #BAE8F5;
 }
 
-img#logout {
+img#logout, img#backarrow {
   width: 15px;
   height: 15px;
 }
@@ -88,6 +88,34 @@ button#logout {
   padding-top: 20px;
 }
 
+button#back {
+  display: block;
+  float: left;
+  margin: 0 auto;
+  border: none;
+  shadow: none;
+  padding-top: 20px;
+}
+
+form#buttons {
+  width: 70%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+form#edit {
+  display: inline-block;
+  width: auto;
+  margin: 0 auto;
+  border: none;
+  shadow: none;
+}
+
+button#edit {
+  border: none;
+  float: right;
+}
+
 div#container {
     text-align: center;
     width: 100%;
@@ -110,12 +138,12 @@ table, td, th {
 
   h1#newthought {
       font-size : 40px;
-      padding-top: 50px;
+      padding-top: 30px;
       }
 
   h1#history {
       font-size : 45px;
-      padding-top: 50px;
+      padding-top: 10px;
       }
 
   textarea {

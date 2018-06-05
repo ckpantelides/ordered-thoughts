@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css?family=Abril+Fatface" rel="stylesheet"/>
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='style.css') }}">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  <title>Edit thoughts</title>
+
+</head>
+
+<body>
+
+  <form id="buttons">
+    <button type="submit" formaction="/history" id="back">
+      <img src = static/backarrow.svg id="backarrow">
+    </button>
+      <button type="submit" formaction="/logout" id="logout">
+          <img src = static/logout.svg id="logout">
+      </button>
+  </form>
+
+  <h1 id="history">Edit thoughts.</h1>
+
+  <div id="container">
+
+    <!-- Nested loops to iterate over category and then thought in category -->
+
+    {% for category in thoughts_by_category %}
+      <p>{{ category[0] }}</p>
+
+      <table>
+        {% for elem in category[1] %}
+        <tr>
+          <form id="edit" action="/edit" method="post">
+            <td>
+              {{ elem }}
+              <button id="edit" type="submit" name="editbutton" value="{{elem}}">-</button>
+            </td>
+          </form>
+        </tr>
+        {% endfor %}
+      </table>
+
+    {% endfor %}
+
+  </div>
+
+</body>
+
+</html>

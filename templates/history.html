@@ -13,7 +13,10 @@
 
 <body>
 
-  <form>
+  <form id="buttons">
+      <button type="submit" formaction="/" id="back">
+        <img src = static/backarrow.svg id="backarrow">
+      </button>
       <button type="submit" formaction="/logout" id="logout">
           <img src = static/logout.svg id="logout">
       </button>
@@ -37,6 +40,13 @@
   {% endfor %}
 
   </div>
+
+  <br>
+  <br>
+
+  <form>
+    <button type="submit" formaction="/edit">Edit thoughts</button>
+  </form>
 
 </body>
 

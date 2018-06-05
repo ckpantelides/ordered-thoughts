@@ -12,7 +12,7 @@ from functools import wraps
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
-app.secret_key = os.environ.get('SECRET_KEY')
+app.secret_key = SECRET_KEY = b'_5#y2L"F4Q8z\n\xec]/'
 
 # unwanted html characters with safe replacements
 html_escape_table = {
@@ -188,8 +188,19 @@ def fileThought():
     db = sqlite3.connect("test.db")
 
     # Retrieve category and thought from html
-    category = request.form.get("category")
+    # Ensure category is lowercase
+    category = request.form.get("category").lower()
     thought = request.form.get("thought")
+
+    # Ensure new tought was submitted
+    if not request.form.get("thought"):
+      flash("what are you thinking?")
+      return render_template("newthought.html")
+
+    # Ensure category was submitted
+    if not request.form.get("category"):
+      flash("category please")
+      return render_template("newthought.html")
 
     # Insert new thought with session_id into database
     db.execute('''INSERT INTO thoughts(category, thought, user_id)
@@ -222,6 +233,50 @@ def history():
 
   # pass thoughts_by_category dict into history.html, organise dict using .items() method
   return render_template("history.html", thoughts_by_category=thoughts_by_category.items())
+
+@app.route('/edit', methods=["GET", "POST"])
+@login_required
+def edit():
+  """Edit thoughts"""
+
+  if request.method =="GET":
+      # Get history of user's thoughts, group together by category
+      db = sqlite3.connect("test.db")
+      cursor = db.cursor()
+
+      collected_thoughts = cursor.execute('SELECT category, thought FROM thoughts WHERE user_id=? ORDER BY CATEGORY ASC', (session["user_id"],))
+
+      # use default dict to reorganise users thoughts by its category key value
+      thoughts_by_category = defaultdict(list)
+      for category, thought in collected_thoughts:
+          thoughts_by_category[category].append(thought)
+
+      # pass thoughts_by_category dict into edit.html, organise dict using .items() method
+      return render_template("edit.html", thoughts_by_category=thoughts_by_category.items())
+
+  if request.method =="POST":
+
+      # get thought to be deleted from html
+      elem = request.form.get("editbutton")
+
+      db = sqlite3.connect("test.db")
+      cursor = db.cursor()
+
+      # delete thought where user_id and thought match
+      db.execute('DELETE FROM thoughts WHERE user_id=? AND thought=?', (session["user_id"], elem,))
+
+      # Save changes to database
+      db.commit()
+
+      collected_thoughts = cursor.execute('SELECT category, thought FROM thoughts WHERE user_id=? ORDER BY CATEGORY ASC', (session["user_id"],))
+
+      # use default dict to reorganise users thoughts by its category key value
+      thoughts_by_category = defaultdict(list)
+      for category, thought in collected_thoughts:
+          thoughts_by_category[category].append(thought)
+
+      # pass thoughts_by_category dict into edit.html, organise dict using .items() method
+      return render_template("edit.html", thoughts_by_category=thoughts_by_category.items())
 
 if __name__ == '__main__':
     app.run()
