@@ -86,6 +86,7 @@ button#logout {
   border: none;
   shadow: none;
   padding-top: 20px;
+  padding-right: 30px;
 }
 
 button#back {
@@ -151,5 +152,9 @@ table, td, th {
   }
 
   table {
+    width: 100%;
+  }
+
+  form#buttons {
     width: 100%;
   }
