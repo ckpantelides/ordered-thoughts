@@ -272,7 +272,8 @@ def edit():
       # Save changes to database
       conn.commit()
 
-      collected_thoughts = cur.execute('SELECT category, thought FROM thoughts WHERE user_id=(%s) ORDER BY CATEGORY ASC', (session["user_id"],))
+      cur.execute('SELECT category, thought FROM thoughts WHERE user_id=(%s) ORDER BY CATEGORY ASC', (session["user_id"],))
+      collected_thoughts = cur.fetchall()
 
       # use default dict to reorganise users thoughts by its category key value
       thoughts_by_category = defaultdict(list)
