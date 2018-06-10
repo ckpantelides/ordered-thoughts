@@ -64,7 +64,6 @@ input {
 
 input#file {
     border: 1px solid black;
-    border-radius: 50px;
 }
 
 input#category {
@@ -79,7 +78,6 @@ button {
     background-color: #BAE8F5;
     outline: none;
     border: 1px solid black;
-    border-radius: 50px;
 }
 
 button#logout {
