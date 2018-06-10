@@ -19,6 +19,9 @@ DATABASE_URL = os.environ['DATABASE_URL']
 
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
+# Opens cursor to perform db operations
+cur = conn.cursor()
+
 # unwanted html characters with safe replacements
 html_escape_table = {
   "&": "&amp;",
@@ -71,9 +74,6 @@ def login():
         username= html_escape(request.form.get("username"))
         username= username.lower()
 
-        # Opens cursor to perform db operation
-        cur = conn.cursor()
-
         # Query database for username
         cur.execute('SELECT * FROM users WHERE Username=(%s)', (username,))
 
@@ -94,8 +94,6 @@ def login():
 
         # Remember which user has logged in
         session["user_id"] = row[0]
-
-        conn.close()
 
         # Redirect user to newthought page
         return redirect("/")
@@ -142,9 +140,6 @@ def register():
       if request.form.get("password") != request.form.get("confirmation"):
         flash("password and confirmation don't match")
         return render_template("register.html")
-
-      # opens cursor object for db operations
-      cur = conn.cursor()
 
       # get username and password from register form,
       # hash password with werkzeug, force lowercase
@@ -202,18 +197,14 @@ def fileThought():
       flash("category please")
       return render_template("newthought.html")
 
-    # Open a cursor to perform database operations
-    cur = conn.cursor()
-
     # Insert new thought with session_id into database
     cur.execute('''INSERT INTO thoughts(category, thought, user_id)
                   VALUES(%s,%s,%s)''', (category, thought, session["user_id"],))
 
     flash('Successly filed!')
 
-    # Save changes to database and close
+    # Save changes to databasee
     conn.commit()
-    conn.close()
 
     return render_template("newthought.html")
 
@@ -226,7 +217,6 @@ def history():
   """See history of thoughts"""
 
   # Get history of user's thoughts, group together by category
-  cur = conn.cursor()
   cur.execute('SELECT category, thought FROM thoughts WHERE user_id=(%s) ORDER BY CATEGORY ASC', (session["user_id"],))
   collected_thoughts = cur.fetchall()
 
@@ -246,8 +236,6 @@ def edit():
   if request.method =="GET":
 
       # Get history of user's thoughts, group together by category
-      cur = conn.cursor()
-
       cur.execute('SELECT category, thought FROM thoughts WHERE user_id=(%s) ORDER BY CATEGORY ASC', (session["user_id"],))
       collected_thoughts = cur.fetchall()
 
@@ -263,8 +251,6 @@ def edit():
 
       # get thought to be deleted from html
       elem = request.form.get("editbutton")
-
-      cur = conn.cursor()
 
       # delete thought where user_id and thought match
       cur.execute('DELETE FROM thoughts WHERE user_id=(%s) AND thought=(%s)', (session["user_id"], elem,))
