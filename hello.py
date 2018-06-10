@@ -75,7 +75,7 @@ def login():
         cur = conn.cursor()
 
         # Query database for username
-        cur.execute('SELECT * FROM users WHERE Username=?', (username,))
+        cur.execute('SELECT * FROM users WHERE Username=(%s)', (username,))
 
         row = cur.fetchone()
 
@@ -153,7 +153,7 @@ def register():
       hash = generate_password_hash(password)
 
       # check through all usernames
-      cur.execute('SELECT * FROM users WHERE Username=?', (username,))
+      cur.execute('SELECT * FROM users WHERE Username=(%s)', (username,))
 
       # end registration if username exists
       if cur.fetchone() is not None:
@@ -163,13 +163,13 @@ def register():
       # commit new user to database if username unique
       else:
         cur.execute('''INSERT INTO users(username, hash)
-                  VALUES(?,?)''', (username, hash))
+                  VALUES(%s,%s)''', (username, hash))
         conn.commit()
 
       flash('New user registered')
 
       # select users data
-      cur.execute('SELECT * FROM users WHERE Username=?', (username,))
+      cur.execute('SELECT * FROM users WHERE Username=(%s)', (username,))
       row = cur.fetchone()
 
       # save user_id to session, so it can be used as foreign key for new thoughts
@@ -207,7 +207,7 @@ def fileThought():
 
     # Insert new thought with session_id into database
     cur.execute('''INSERT INTO thoughts(category, thought, user_id)
-                  VALUES(?,?,?)''', (category, thought, session["user_id"],))
+                  VALUES(%s,%s,%s)''', (category, thought, session["user_id"],))
 
     flash('Successly filed!')
 
@@ -227,7 +227,7 @@ def history():
 
   # Get history of user's thoughts, group together by category
   cur = conn.cursor()
-  collected_thoughts = cur.execute('SELECT category, thought FROM thoughts WHERE user_id=? ORDER BY CATEGORY ASC', (session["user_id"],))
+  collected_thoughts = cur.execute('SELECT category, thought FROM thoughts WHERE user_id=(%s) ORDER BY CATEGORY ASC', (session["user_id"],))
 
   # use default dict to reorganise users thoughts by its category key value
   thoughts_by_category = defaultdict(list)
@@ -247,7 +247,7 @@ def edit():
       # Get history of user's thoughts, group together by category
       cur = conn.cursor()
 
-      collected_thoughts = cur.execute('SELECT category, thought FROM thoughts WHERE user_id=? ORDER BY CATEGORY ASC', (session["user_id"],))
+      collected_thoughts = cur.execute('SELECT category, thought FROM thoughts WHERE user_id=(%s) ORDER BY CATEGORY ASC', (session["user_id"],))
 
       # use default dict to reorganise users thoughts by its category key value
       thoughts_by_category = defaultdict(list)
@@ -265,12 +265,12 @@ def edit():
       cur = conn.cursor()
 
       # delete thought where user_id and thought match
-      cur.execute('DELETE FROM thoughts WHERE user_id=? AND thought=?', (session["user_id"], elem,))
+      cur.execute('DELETE FROM thoughts WHERE user_id=(%s) AND thought=(%s)', (session["user_id"], elem,))
 
       # Save changes to database
       conn.commit()
 
-      collected_thoughts = cur.execute('SELECT category, thought FROM thoughts WHERE user_id=? ORDER BY CATEGORY ASC', (session["user_id"],))
+      collected_thoughts = cur.execute('SELECT category, thought FROM thoughts WHERE user_id=(%s) ORDER BY CATEGORY ASC', (session["user_id"],))
 
       # use default dict to reorganise users thoughts by its category key value
       thoughts_by_category = defaultdict(list)
