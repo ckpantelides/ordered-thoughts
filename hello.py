@@ -1,5 +1,6 @@
 import sqlite3, html
 import os
+import psycopg2
 
 from flask import Flask, redirect, render_template, request, url_for, session, flash
 from flask_session import Session
@@ -12,7 +13,11 @@ from functools import wraps
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
-app.secret_key = SECRET_KEY = b'_5#y2L"F4Q8z\n\xec]/'
+app.secret_key = SECRET_KEY = os.environ.get('SECRET_KEY')
+
+DATABASE_URL = os.environ['DATABASE_URL']
+
+conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
 # unwanted html characters with safe replacements
 html_escape_table = {
@@ -66,14 +71,13 @@ def login():
         username= html_escape(request.form.get("username"))
         username= username.lower()
 
-        # Selects database and cursor object
-        db = sqlite3.connect("test.db")
-        cursor = db.cursor()
+        # Opens cursor to perform db operation
+        cur = conn.cursor()
 
         # Query database for username
-        cursor.execute('SELECT * FROM users WHERE Username=?', (username,))
+        cur.execute('SELECT * FROM users WHERE Username=?', (username,))
 
-        row = cursor.fetchone()
+        row = cur.fetchone()
 
         # Ensure username exists
         if row == None:
@@ -91,7 +95,7 @@ def login():
         # Remember which user has logged in
         session["user_id"] = row[0]
 
-        db.close()
+        conn.close()
 
         # Redirect user to newthought page
         return redirect("/")
@@ -139,9 +143,8 @@ def register():
         flash("password and confirmation don't match")
         return render_template("register.html")
 
-      # selects database and cursor object
-      db = sqlite3.connect("test.db")
-      cursor = db.cursor()
+      # opens cursor object for db operations
+      cur = conn.cursor()
 
       # get username and password from register form,
       # hash password with werkzeug, force lowercase
@@ -150,24 +153,24 @@ def register():
       hash = generate_password_hash(password)
 
       # check through all usernames
-      cursor.execute('SELECT * FROM users WHERE Username=?', (username,))
+      cur.execute('SELECT * FROM users WHERE Username=?', (username,))
 
       # end registration if username exists
-      if cursor.fetchone() is not None:
+      if cur.fetchone() is not None:
         flash("That username is already taken")
         return render_template('register.html')
 
       # commit new user to database if username unique
       else:
-        cursor.execute('''INSERT INTO users(username, hash)
+        cur.execute('''INSERT INTO users(username, hash)
                   VALUES(?,?)''', (username, hash))
-        db.commit()
+        conn.commit()
 
       flash('New user registered')
 
       # select users data
-      cursor.execute('SELECT * FROM users WHERE Username=?', (username,))
-      row = cursor.fetchone()
+      cur.execute('SELECT * FROM users WHERE Username=?', (username,))
+      row = cur.fetchone()
 
       # save user_id to session, so it can be used as foreign key for new thoughts
       session["user_id"] = row[0]
@@ -184,9 +187,6 @@ def fileThought():
 
   if request.method =="POST":
 
-    # Connect to database
-    db = sqlite3.connect("test.db")
-
     # Retrieve category and thought from html
     # Ensure category is lowercase
     category = request.form.get("category").lower()
@@ -202,15 +202,19 @@ def fileThought():
       flash("category please")
       return render_template("newthought.html")
 
+    # Open a cursor to perform database operations
+    cur = conn.cursor()
+
     # Insert new thought with session_id into database
-    db.execute('''INSERT INTO thoughts(category, thought, user_id)
+    cur.execute('''INSERT INTO thoughts(category, thought, user_id)
                   VALUES(?,?,?)''', (category, thought, session["user_id"],))
 
     flash('Successly filed!')
 
     # Save changes to database and close
-    db.commit()
-    db.close()
+    conn.commit()
+    conn.close()
+
     return render_template("newthought.html")
 
   else:
@@ -222,9 +226,8 @@ def history():
   """See history of thoughts"""
 
   # Get history of user's thoughts, group together by category
-  db = sqlite3.connect("test.db")
-  cursor = db.cursor()
-  collected_thoughts = cursor.execute('SELECT category, thought FROM thoughts WHERE user_id=? ORDER BY CATEGORY ASC', (session["user_id"],))
+  cur = conn.cursor()
+  collected_thoughts = cur.execute('SELECT category, thought FROM thoughts WHERE user_id=? ORDER BY CATEGORY ASC', (session["user_id"],))
 
   # use default dict to reorganise users thoughts by its category key value
   thoughts_by_category = defaultdict(list)
@@ -240,11 +243,11 @@ def edit():
   """Edit thoughts"""
 
   if request.method =="GET":
-      # Get history of user's thoughts, group together by category
-      db = sqlite3.connect("test.db")
-      cursor = db.cursor()
 
-      collected_thoughts = cursor.execute('SELECT category, thought FROM thoughts WHERE user_id=? ORDER BY CATEGORY ASC', (session["user_id"],))
+      # Get history of user's thoughts, group together by category
+      cur = conn.cursor()
+
+      collected_thoughts = cur.execute('SELECT category, thought FROM thoughts WHERE user_id=? ORDER BY CATEGORY ASC', (session["user_id"],))
 
       # use default dict to reorganise users thoughts by its category key value
       thoughts_by_category = defaultdict(list)
@@ -259,16 +262,15 @@ def edit():
       # get thought to be deleted from html
       elem = request.form.get("editbutton")
 
-      db = sqlite3.connect("test.db")
-      cursor = db.cursor()
+      cur = conn.cursor()
 
       # delete thought where user_id and thought match
-      db.execute('DELETE FROM thoughts WHERE user_id=? AND thought=?', (session["user_id"], elem,))
+      cur.execute('DELETE FROM thoughts WHERE user_id=? AND thought=?', (session["user_id"], elem,))
 
       # Save changes to database
-      db.commit()
+      conn.commit()
 
-      collected_thoughts = cursor.execute('SELECT category, thought FROM thoughts WHERE user_id=? ORDER BY CATEGORY ASC', (session["user_id"],))
+      collected_thoughts = cur.execute('SELECT category, thought FROM thoughts WHERE user_id=? ORDER BY CATEGORY ASC', (session["user_id"],))
 
       # use default dict to reorganise users thoughts by its category key value
       thoughts_by_category = defaultdict(list)
