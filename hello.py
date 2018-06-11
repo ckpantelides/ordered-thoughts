@@ -269,5 +269,24 @@ def edit():
       # pass thoughts_by_category dict into edit.html, organise dict using .items() method
       return render_template("edit.html", thoughts_by_category=thoughts_by_category.items())
 
+@app.route('/deleteuser', methods=["POST"])
+@login_required
+def deleteuser():
+  """Delete user"""
+
+  if request.method =="POST":
+
+      # delete all of users data
+      cur.execute('DELETE * FROM thoughts WHERE user_id=(%s)', (session["user_id"],))
+      cur.execute('DELETE * FROM users WHERE user_id=(%s)', (session["user_id"],))
+
+      # Save changes to database
+      conn.commit()
+
+      flash('All user data deleted')
+
+      # return to login page
+      return render_template("login.html")
+
 if __name__ == '__main__':
     app.run()
