@@ -269,12 +269,12 @@ def edit():
       # pass thoughts_by_category dict into edit.html, organise dict using .items() method
       return render_template("edit.html", thoughts_by_category=thoughts_by_category.items())
 
-@app.route('/deleteuser', methods=["POST"])
+@app.route('/deleteuser', methods=["GET"])
 @login_required
 def deleteuser():
   """Delete user"""
 
-  if request.method =="POST":
+  if request.method =="GET":
 
       # delete all of users data
       cur.execute('DELETE * FROM thoughts WHERE user_id=(%s)', (session["user_id"],))
