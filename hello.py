@@ -277,8 +277,8 @@ def deleteuser():
   if request.method =="GET":
 
       # delete all of users data
-      cur.execute('DELETE * FROM thoughts WHERE user_id=(%s)', (session["user_id"],))
-      cur.execute('DELETE * FROM users WHERE user_id=(%s)', (session["user_id"],))
+      cur.execute('DELETE FROM thoughts WHERE user_id=(%s)', (session["user_id"],))
+      cur.execute('DELETE FROM users WHERE user_id=(%s)', (session["user_id"],))
 
       # Save changes to database
       conn.commit()
