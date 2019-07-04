@@ -5,7 +5,7 @@ It's hosted [here](http://orderedthoughts.herokuapp.com)
 
 A python app built with flask. It stores your thoughts by category for easy recall (in a SQL database).
 
-I created the user authentication, and used thr werkzeug package to salt and hash the login details.
+I created the user authentication, and used the werkzeug package to salt and hash the login details.
 
 ![img1]
 
