@@ -3,9 +3,11 @@ Ordered thoughts
 
 It's hosted [here](http://orderedthoughts.herokuapp.com)
 
-A python app built with flask. It stores your thoughts by category for easy recall (in a SQL database).
+A python app built with flask.
 
-I created the user authentication, and used the werkzeug package to salt and hash the login details.
+#### Store your thoughts by category for easy recall
+
+I created the user authentication, using the werkzeug package to salt and hash login details. Flask-session ensures the user needs to be logged in to view the routes to add new thoughts etc. It's currently hosted on heroku, with a postgresql database to store the data in relational tables.
 
 ![img1]
 
