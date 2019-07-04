@@ -13,7 +13,7 @@ I created the user authentication, and used the werkzeug package to salt and has
 
 ![img3]
 
-[img1]: https://github.com/ckpantelides/ordered-thoughts/blob/images/ordered1.jpg
+[img1]: https://github.com/ckpantelides/ordered-thoughts/blob/images/ordered-crop1.jpg
 [img2]: https://github.com/ckpantelides/ordered-thoughts/blob/images/ordered2.jpg
 [img3]: https://github.com/ckpantelides/ordered-thoughts/blob/images/ordered3.jpg
 
