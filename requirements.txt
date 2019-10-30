@@ -8,7 +8,7 @@ Flask == 0.12.2
 Flask_Session == 0.3.1
 
 # hello.py: 9
-Werkzeug == 0.14.1
+Werkzeug == 0.15.3
 
 # hello.py: 3
 psycopg2 == 2.7.4
